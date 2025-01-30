@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "target": "esnext"
+  },
+  "include": [
+    "../../../inetpub/wwwroot/view/client.d.ts",
+    "../../../inetpub/wwwroot/view/dist/**/*.d.ts",
+    "index.tsx"
+  ],
+  "name": "highcharts_react_ts"
+}
