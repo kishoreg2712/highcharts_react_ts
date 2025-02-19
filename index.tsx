@@ -123,7 +123,6 @@ class Widget extends ReactWidget {
 	constructor(container: HTMLElement, config: IComponentConfig) {
 		super(container);
 		this.Properties.Read(config);
-
 		this.RefreshEvent.Then(() => {
 			this.RefreshEvent.AddListener(() => {
 				this.renderWidget();
@@ -136,9 +135,8 @@ class Widget extends ReactWidget {
 			this.fetchClassInstances()
 				.then(classInstances => {
 					if (classInstances.length > 0) {
-						console.log("Fetched class instances:", classInstances);
-						classInstances.forEach(x=>{
-							if(x["Parent"] == "160ee230-f4ff-4308-b574-85ab8f38558e"){
+						classInstances.forEach(x => {
+							if (x["Parent"] == "160ee230-f4ff-4308-b574-85ab8f38558e") {
 								console.log(x);
 							}
 						})
@@ -161,7 +159,23 @@ class Widget extends ReactWidget {
 			// Fetch instances asynchronously
 			const classInstances = await this.conn.FetchClassInstances("Path", -1);
 
-			console.log("classInstances ::", classInstances);
+			var pathclass = this.conn.Classes['Path'];
+			if (pathclass) {
+				const pathInstance = pathclass.Instances.GetInstanceSet();
+				pathInstance.Ready.Then(() => {
+					pathInstance.forEach(element => {
+						const name = element.Get<string>("Name");
+						const parent = element.GetFormattedValue("Parent");
+						const equipment = element.GetFormattedValue("Equipment");
+						const ProcessPath = element.GetFormattedValue("ProcessPath");
+						//console.log("Name: " + name + ',' + " Parent: " + parent);
+						if (parent === 'Location') {
+							console.log("Name: " + name + ',' + " Parent: " + parent + ',' + "Equipment : " + equipment+"ProcessPath::" + ProcessPath);
+						}
+					});
+				});
+				// console.log(pathInstance);
+			}
 
 			// Ensure the result is an array before returning
 			if (!Array.isArray(classInstances)) {
@@ -178,37 +192,8 @@ class Widget extends ReactWidget {
 		}
 	}
 
-	private processInstances(): void {
-		try {
-
-
-			const instances = this.conn?.Classes?.["Path"]?.Instances?.GetInstanceSet();
-			console.log("Instances retrieved:", instances);
-
-			if (instances != null) {
-				if (instances.length > 0) {
-					instances.forEach(instance => {
-						const parent = String(instance?.["Parent"] || ""); // Force string conversion safely
-						console.log(`Checking instance:`, instance);
-
-						if (parent === "Location") {
-							const name = String(instance?.["Name"] || "");
-							const equipment = String(instance?.["Equipment"] || "");
-
-							console.log(`${name}::${equipment}`);
-						}
-					});
-				}
-			}
-		} catch (error) {
-			console.error("Error processing instances:", error);
-		}
-	}
-
 	// ✅ Assign ReactProperties inside renderWidget()
 	private renderWidget(): void {
-
-		//this.processInstances();
 		this.conn = this.Connection.Get() as IDbCacheConnection;
 		this.conn.Classes
 
@@ -226,11 +211,6 @@ class Widget extends ReactWidget {
 
 		// ✅ Assign values dynamically
 		this.ReactProperties = { apiUrl, idField, columns };
-
-		// console.log("API URL:", apiUrl);
-		// console.log("ID Field:", idField);
-		// console.log("Columns:", columns);
-
 		this.requestRender();
 	}
 }
